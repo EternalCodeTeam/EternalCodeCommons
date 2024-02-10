@@ -7,9 +7,10 @@ plugins {
 
 
 dependencies {
-    api(project(":commons-shared"))
-    api("org.spigotmc:spigot-api:1.19.4-R0.1-SNAPSHOT")
+    api(project(":eternalcode-commons-shared"))
     api("net.kyori:adventure-api:4.15.0")
+    api("net.kyori:adventure-text-minimessage:4.15.0")
+    api("net.kyori:adventure-text-serializer-legacy:4.15.0")
 }
 
 tasks.test {

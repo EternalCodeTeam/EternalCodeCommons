@@ -1,5 +1,5 @@
 rootProject.name = "eternalcode-commons"
 
-include(":commons-shared-bukkit")
-include(":commons-adventure")
-include("commons-shared")
+include(":eternalcode-commons-shared-bukkit")
+include(":eternalcode-commons-adventure")
+include(":eternalcode-commons-shared")
