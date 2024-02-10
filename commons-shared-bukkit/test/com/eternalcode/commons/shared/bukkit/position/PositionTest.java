@@ -16,32 +16,32 @@ class PositionTest {
 
     @Test
     void getWorld() {
-        assertEquals("world", position.getWorld());
+        assertEquals("world", position.world());
     }
 
     @Test
     void getX() {
-        assertEquals(1.0d, position.getX());
+        assertEquals(1.0d, position.x());
     }
 
     @Test
     void getY() {
-        assertEquals(2.0d, position.getY());
+        assertEquals(2.0d, position.y());
     }
 
     @Test
     void getZ() {
-        assertEquals(3.0d, position.getZ());
+        assertEquals(3.0d, position.z());
     }
 
     @Test
     void getYaw() {
-        assertEquals(4.0f, position.getYaw());
+        assertEquals(4.0f, position.yaw());
     }
 
     @Test
     void getPitch() {
-        assertEquals(5.0f, position.getPitch());
+        assertEquals(5.0f, position.pitch());
     }
 
     @Test
@@ -55,14 +55,14 @@ class PositionTest {
         Position position3 = new Position(1.0d, 2.0d, 3.1d, 4.0f, 5.0f, "world");
 
         // Reflexive test
-        assertTrue(position.equals(position));
+        assertEquals(position, position);
 
         // Symmetric test
-        assertTrue(position.equals(position2));
-        assertTrue(position2.equals(position));
+        assertEquals(position, position2);
+        assertEquals(position2, position);
 
-        assertFalse(position.equals(position3));
-        assertFalse(position3.equals(position));
+        assertNotEquals(position, position3);
+        assertNotEquals(position3, position);
 
         // hashCode
         assertEquals(position.hashCode(), position2.hashCode());

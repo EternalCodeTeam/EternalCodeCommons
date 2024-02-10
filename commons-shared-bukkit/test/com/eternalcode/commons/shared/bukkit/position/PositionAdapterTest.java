@@ -27,10 +27,10 @@ class PositionAdapterTest {
 
         Position position = PositionAdapter.convert(location);
 
-        assertEquals(1, position.getX());
-        assertEquals(2, position.getY());
-        assertEquals(3, position.getZ());
-        assertEquals(WORLD_NAME, position.getWorld());
+        assertEquals(1, position.x());
+        assertEquals(2, position.y());
+        assertEquals(3, position.z());
+        assertEquals(WORLD_NAME, position.world());
     }
 
     @Test
