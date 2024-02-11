@@ -8,7 +8,8 @@ plugins {
 
 dependencies {
     api(project(":eternalcode-commons-shared"))
-    api("org.spigotmc:spigot-api:1.19.4-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.19.4-R0.1-SNAPSHOT")
+    api("org.jetbrains:annotations:24.1.0")
     api("net.kyori:adventure-api:4.15.0")
 }
 
