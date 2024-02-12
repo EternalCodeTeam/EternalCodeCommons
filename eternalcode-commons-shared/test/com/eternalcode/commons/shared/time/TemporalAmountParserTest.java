@@ -1,7 +1,10 @@
 package com.eternalcode.commons.shared.time;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.eternalcode.commons.shared.time.TemporalAmountParser.LocalDateTimeProvider;
 import java.time.Duration;
@@ -190,6 +193,25 @@ class TemporalAmountParserTest {
         String formatted = temporalAmountParser.format(duration);
 
         assertEquals(expected, formatted);
+    }
+
+    @Test
+    void testFormatWithRemoveMilliSeconds() {
+        Duration temporalAmount = Duration.ofDays(1)
+            .plusHours(10)
+            .plusMinutes(20)
+            .plusSeconds(30)
+            .plusMillis(40)
+            .plusNanos(50);
+
+        TemporalAmountParser<Duration> timeUnits = DurationParser.TIME_UNITS;
+
+        String formattedWithoutMillis = timeUnits.format(temporalAmount, true);
+        String formattedWithMillis = timeUnits.format(temporalAmount, false);
+
+        assertNotEquals(formattedWithMillis, formattedWithoutMillis);
+        assertEquals("10h20m30s", formattedWithoutMillis);
+        assertEquals("10h20m30s40ms", formattedWithMillis);
     }
 
     @Test

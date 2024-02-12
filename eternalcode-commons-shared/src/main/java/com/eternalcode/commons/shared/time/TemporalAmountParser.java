@@ -262,7 +262,7 @@ public abstract class TemporalAmountParser<T extends TemporalAmount> {
      * @param temporalAmount the temporal amount to format. Must not be null.
      * @return the formatted string
      */
-    public String format(T temporalAmount) {
+    public String format(T temporalAmount, boolean removeMills) {
         StringBuilder builder = new StringBuilder();
         Duration duration = this.toDuration(this.baseForTimeEstimation, temporalAmount);
 
@@ -276,6 +276,11 @@ public abstract class TemporalAmountParser<T extends TemporalAmount> {
 
         for (String key : keys) {
             ChronoUnit chronoUnit = this.units.get(key);
+
+            if (removeMills && chronoUnit.equals(ChronoUnit.MILLIS)) {
+                continue;
+            }
+
             Long part = UNIT_TO_NANO.get(chronoUnit);
 
             if (part == null) {
@@ -295,6 +300,10 @@ public abstract class TemporalAmountParser<T extends TemporalAmount> {
         }
 
         return builder.toString();
+    }
+
+    public String format(T temporalAmount) {
+        return this.format(temporalAmount, false);
     }
 
     protected abstract Duration toDuration(LocalDateTimeProvider baseForTimeEstimation, T temporalAmount);
