@@ -193,6 +193,34 @@ class TemporalAmountParserTest {
     }
 
     @Test
+    void testRoundOff() {
+        TemporalAmountParser<Duration> temporalAmountParser = new DurationParser()
+            .withUnit("s", ChronoUnit.SECONDS)
+            .withUnit("m", ChronoUnit.MINUTES)
+            .withUnit("h", ChronoUnit.HOURS)
+            .withUnit("d", ChronoUnit.DAYS);
+        temporalAmountParser.roundOff(ChronoUnit.MILLIS);
+
+        Duration temporalAmount = Duration.ofDays(1)
+            .plus(Duration.ofHours(1))
+            .plus(Duration.ofMinutes(1))
+            .plus(Duration.ofSeconds(1))
+            .plus(Duration.ofMillis(500));
+
+        String formatted = temporalAmountParser.format(temporalAmount);
+        assertEquals("1d1h1m1s", formatted);
+
+        temporalAmount = Duration.ofDays(1)
+            .plus(Duration.ofHours(1))
+            .plus(Duration.ofMinutes(1))
+            .plus(Duration.ofSeconds(1))
+            .plus(Duration.ofMillis(499));
+
+        formatted = temporalAmountParser.format(temporalAmount);
+        assertEquals("1d1h1m1s", formatted);
+    }
+
+    @Test
     void testNotSupportedChronoUnit() {
         TemporalAmountParser<Period> temporalAmountParser = new PeriodParser()
             .withUnit("mill", ChronoUnit.MILLENNIA);

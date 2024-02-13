@@ -9,9 +9,11 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAmount;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 
 /**
@@ -40,6 +42,12 @@ public abstract class TemporalAmountParser<T extends TemporalAmount> {
 
     private static final Map<ChronoUnit, Long> UNIT_TO_NANO = new LinkedHashMap<>();
     private static final Map<ChronoUnit, Integer> PART_TIME_UNITS = new LinkedHashMap<>();
+
+    private Set<ChronoUnit> roundedUnits = new HashSet<>();
+
+    public void roundOff(ChronoUnit unit) {
+        roundedUnits.add(unit);
+    }
 
     static {
         UNIT_TO_NANO.put(ChronoUnit.NANOS, 1L);
@@ -276,6 +284,11 @@ public abstract class TemporalAmountParser<T extends TemporalAmount> {
 
         for (String key : keys) {
             ChronoUnit chronoUnit = this.units.get(key);
+
+            if (roundedUnits.contains(chronoUnit)) {
+                continue;
+            }
+
             Long part = UNIT_TO_NANO.get(chronoUnit);
 
             if (part == null) {
