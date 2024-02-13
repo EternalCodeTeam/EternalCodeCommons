@@ -45,8 +45,9 @@ public abstract class TemporalAmountParser<T extends TemporalAmount> {
 
     private Set<ChronoUnit> roundedUnits = new HashSet<>();
 
-    public void roundOff(ChronoUnit unit) {
-        roundedUnits.add(unit);
+    public TemporalAmountParser<T> roundOff(ChronoUnit unit) {
+        this.roundedUnits.add(unit);
+        return this;
     }
 
     static {
