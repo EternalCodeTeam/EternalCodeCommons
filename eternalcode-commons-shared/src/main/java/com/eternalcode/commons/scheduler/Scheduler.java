@@ -1,4 +1,4 @@
-package com.eternalcode.commons.shared.scheduler;
+package com.eternalcode.commons.scheduler;
 
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;

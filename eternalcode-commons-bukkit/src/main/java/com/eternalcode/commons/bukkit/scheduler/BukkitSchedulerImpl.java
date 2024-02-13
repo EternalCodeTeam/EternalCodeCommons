@@ -1,7 +1,7 @@
 package com.eternalcode.commons.bukkit.scheduler;
 
-import com.eternalcode.commons.shared.scheduler.Scheduler;
-import com.eternalcode.commons.shared.scheduler.Task;
+import com.eternalcode.commons.scheduler.Scheduler;
+import com.eternalcode.commons.scheduler.Task;
 import java.util.concurrent.CompletableFuture;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;

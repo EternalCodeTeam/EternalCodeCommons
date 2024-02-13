@@ -1,6 +1,6 @@
 package com.eternalcode.commons.bukkit.scheduler;
 
-import com.eternalcode.commons.shared.scheduler.Task;
+import com.eternalcode.commons.scheduler.Task;
 import org.bukkit.scheduler.BukkitTask;
 
 class BukkitTaskImpl implements Task {

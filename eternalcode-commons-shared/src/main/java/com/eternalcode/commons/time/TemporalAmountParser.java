@@ -1,4 +1,4 @@
-package com.eternalcode.commons.shared.time;
+package com.eternalcode.commons.time;
 
 import java.math.BigInteger;
 import java.time.Duration;

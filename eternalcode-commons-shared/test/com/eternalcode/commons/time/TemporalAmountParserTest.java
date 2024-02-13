@@ -1,9 +1,9 @@
-package com.eternalcode.commons.shared.time;
+package com.eternalcode.commons.time;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.eternalcode.commons.shared.time.TemporalAmountParser.LocalDateTimeProvider;
+import com.eternalcode.commons.time.TemporalAmountParser.LocalDateTimeProvider;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.Month;

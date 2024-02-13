@@ -1,4 +1,4 @@
-package com.eternalcode.commons.shared;
+package com.eternalcode.commons;
 
 import org.junit.jupiter.api.Test;
 

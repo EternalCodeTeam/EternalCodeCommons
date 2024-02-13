@@ -1,4 +1,4 @@
-package com.eternalcode.commons.shared;
+package com.eternalcode.commons;
 
 import java.util.Collection;
 import java.util.Optional;
