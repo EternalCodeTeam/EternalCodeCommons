@@ -1,4 +1,4 @@
-package com.eternalcode.commons.shared.bukkit;
+package com.eternalcode.commons.bukkit;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

@@ -1,4 +1,4 @@
-package com.eternalcode.commons.shared.bukkit.scheduler;
+package com.eternalcode.commons.bukkit.scheduler;
 
 import com.eternalcode.commons.shared.scheduler.Task;
 import org.bukkit.scheduler.BukkitTask;

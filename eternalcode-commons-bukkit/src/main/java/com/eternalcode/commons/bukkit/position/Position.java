@@ -1,4 +1,4 @@
-package com.eternalcode.commons.shared.bukkit.position;
+package com.eternalcode.commons.bukkit.position;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

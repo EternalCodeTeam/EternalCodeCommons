@@ -198,8 +198,8 @@ class TemporalAmountParserTest {
             .withUnit("s", ChronoUnit.SECONDS)
             .withUnit("m", ChronoUnit.MINUTES)
             .withUnit("h", ChronoUnit.HOURS)
-            .withUnit("d", ChronoUnit.DAYS);
-        temporalAmountParser.roundOff(ChronoUnit.MILLIS);
+            .withUnit("d", ChronoUnit.DAYS)
+            .roundOff(ChronoUnit.MILLIS);
 
         Duration temporalAmount = Duration.ofDays(1)
             .plus(Duration.ofHours(1))
