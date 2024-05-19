@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class AdventureUrlPostProcessor implements UnaryOperator<Component> {
 
-    private static final Pattern URL_PATTERN = Pattern.compile("https?://(www\\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()!@:%_+.~#?&/=]*)");
+    private static final Pattern URL_PATTERN = Pattern.compile("https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()!@:%_\\+.~#?&\\/\\/=]*)");
 
     public static final @NotNull TextReplacementConfig CLICKABLE_URL_CONFIG = TextReplacementConfig.builder()
         .match(URL_PATTERN)
