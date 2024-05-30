@@ -9,7 +9,7 @@ plugins {
 dependencies {
     api(project(":eternalcode-commons-shared"))
 
-    api("net.kyori:adventure-text-minimessage:4.16.0")
+    api("net.kyori:adventure-text-minimessage:4.17.0")
     api("net.kyori:adventure-text-serializer-legacy:4.17.0")
 }
 
