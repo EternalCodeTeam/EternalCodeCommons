@@ -8,7 +8,7 @@ version = "1.1.4-SNAPSHOT"
 
 java {
     withSourcesJar()
-    withJavadocJar()
+//    withJavadocJar()
 }
 
 publishing {
