@@ -56,12 +56,12 @@ public class BukkitSchedulerImpl implements Scheduler {
 
     @Override
     public Task async(Location location, Runnable task) {
-        return null;
+        return new BukkitTaskImpl(this.rootScheduler.runTaskAsynchronously(this.plugin, task));
     }
 
     @Override
     public Task async(Entity entity, Runnable task) {
-        return null;
+        return new BukkitTaskImpl(this.rootScheduler.runTaskAsynchronously(this.plugin, task));
     }
 
     @Override
@@ -76,32 +76,32 @@ public class BukkitSchedulerImpl implements Scheduler {
 
     @Override
     public Task laterAsync(Location location, Runnable task, Duration delay) {
-        return null;
+        return new BukkitTaskImpl(this.rootScheduler.runTaskLaterAsynchronously(this.plugin, task, this.toTick(delay)));
     }
 
     @Override
     public Task laterAsync(Entity entity, Runnable task, Duration delay) {
-        return null;
+        return new BukkitTaskImpl(this.rootScheduler.runTaskLaterAsynchronously(this.plugin, task, this.toTick(delay)));
     }
 
     @Override
     public Task timerSync(Runnable task, Duration delay, Duration period) {
-        return new BukkitTaskImpl(this.rootScheduler.runTaskTimer(this.plugin, task, this.toTick(delay), this.toTick(period)));
+        return new BukkitTaskImpl(this.rootScheduler.runTaskTimer(this.plugin, task, this.toTick(delay), this.toTick(period)), true);
     }
 
     @Override
     public Task timerAsync(Runnable task, Duration delay, Duration period) {
-        return new BukkitTaskImpl(this.rootScheduler.runTaskTimerAsynchronously(this.plugin, task, this.toTick(delay), this.toTick(period)));
+        return new BukkitTaskImpl(this.rootScheduler.runTaskTimerAsynchronously(this.plugin, task, this.toTick(delay), this.toTick(period)), true);
     }
 
     @Override
     public Task timerAsync(Location location, Runnable task, Duration delay, Duration period) {
-        return null;
+        return new BukkitTaskImpl(this.rootScheduler.runTaskTimerAsynchronously(this.plugin, task, this.toTick(delay), this.toTick(period)), true);
     }
 
     @Override
     public Task timerAsync(Entity entity, Runnable task, Duration delay, Duration period) {
-        return null;
+        return new BukkitTaskImpl(this.rootScheduler.runTaskTimerAsynchronously(this.plugin, task, this.toTick(delay), this.toTick(period)), true);
     }
 
     @Override
