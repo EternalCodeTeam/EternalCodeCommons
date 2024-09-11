@@ -1,10 +1,12 @@
 package com.eternalcode.commons.folia.scheduler;
 
+import com.eternalcode.commons.bukkit.scheduler.MinecraftScheduler;
 import com.eternalcode.commons.scheduler.Scheduler;
 import com.eternalcode.commons.scheduler.Task;
 import io.papermc.paper.threadedregions.scheduler.AsyncScheduler;
 import io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler;
 import io.papermc.paper.threadedregions.scheduler.RegionScheduler;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -13,8 +15,10 @@ import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitScheduler;
+import org.jetbrains.annotations.NotNull;
 
-public class FoliaSchedulerImpl implements Scheduler {
+public class FoliaSchedulerImpl implements MinecraftScheduler {
 
     public final Plugin plugin;
     private final Server server;
@@ -30,143 +34,129 @@ public class FoliaSchedulerImpl implements Scheduler {
         this.globalRegionScheduler = this.server.getGlobalRegionScheduler();
         this.asyncScheduler = this.server.getAsyncScheduler();
         this.regionScheduler = this.server.getRegionScheduler();
+        this.server.getScheduler();
     }
 
     @Override
-    public boolean isGlobal() {
+    public boolean isGlobalTickThread() {
         return this.server.isGlobalTickThread();
     }
 
     @Override
-    public boolean isTick() {
+    public boolean isPrimaryThread() {
         return this.server.isPrimaryThread();
     }
 
     @Override
-    public boolean isEntity(Entity entity) {
+    public boolean isRegionThread(Entity entity) {
         return this.server.isOwnedByCurrentRegion(entity);
     }
 
     @Override
-    public boolean isRegion(Location location) {
+    public boolean isRegionThread(Location location) {
         return this.server.isOwnedByCurrentRegion(location);
     }
 
     @Override
-    public Task sync(Runnable task) {
-        return new FoliaTaskImpl(this.globalRegionScheduler.run(plugin, runnable -> task.run()));
+    public Task run(Runnable task) {
+        return wrap(this.globalRegionScheduler.run(plugin, runnable -> task.run()));
     }
 
     @Override
-    public Task async(Runnable task) {
-        return new FoliaTaskImpl(this.asyncScheduler.runNow(plugin, runnable -> task.run()));
+    public Task runAsync(Runnable task) {
+        return wrapAsync(this.asyncScheduler.runNow(plugin, runnable -> task.run()));
     }
 
     @Override
-    public Task async(Location location, Runnable task) {
-        return new FoliaTaskImpl(this.regionScheduler.run(plugin, location, runnable -> task.run()));
+    public Task run(Location location, Runnable task) {
+        return wrap(this.regionScheduler.run(plugin, location, runnable -> task.run()));
     }
 
     @Override
-    public Task async(Entity entity, Runnable task) {
-        return new FoliaTaskImpl(entity.getScheduler().run(plugin, runnable -> task.run(), null));
+    public Task run(Entity entity, Runnable task) {
+        return wrap(entity.getScheduler().run(plugin, runnable -> task.run(), null));
     }
 
     @Override
-    public Task laterSync(Runnable task, Duration delay) {
-        if (delay.isZero()) {
-            delay = Duration.ofMillis(1);
-        }
-
-        return new FoliaTaskImpl(this.globalRegionScheduler.runDelayed(
-            plugin,
-            runnable -> task.run(),
-            delay.toMillis())
-        );
+    public Task runLater(Runnable task, Duration delay) {
+        return wrap(this.globalRegionScheduler.runDelayed(plugin, scheduledTask -> task.run(), toTick(delay)));
     }
 
     @Override
-    public Task laterAsync(Runnable task, Duration delay) {
-        return new FoliaTaskImpl(this.globalRegionScheduler.runDelayed(
-            plugin,
-            runnable -> task.run(),
-            delay.toMillis())
-        );
-    }
-
-    @Override
-    public Task laterAsync(Location location, Runnable task, Duration delay) {
-        return new FoliaTaskImpl(this.regionScheduler.runDelayed(
-            plugin,
-            location,
-            runnable -> task.run(),
-            delay.toMillis())
-        );
-    }
-
-    @Override
-    public Task laterAsync(Entity entity, Runnable task, Duration delay) {
-        return new FoliaTaskImpl(entity.getScheduler().runDelayed(
-            plugin,
-            runnable -> task.run(),
-            null,
-            delay.toMillis())
-        );
-    }
-
-    @Override
-    public Task timerSync(Runnable task, Duration delay, Duration period) {
-        if (delay.isZero()) {
-            delay = Duration.ofMillis(1);
-        }
-
-        if (period.isZero()) {
-            period = Duration.ofMillis(1);
-        }
-
-        return new FoliaTaskImpl(this.globalRegionScheduler.runAtFixedRate(
+    public Task runLaterAsync(Runnable task, Duration delay) {
+        return wrapAsync(this.asyncScheduler.runDelayed(
             plugin,
             runnable -> task.run(),
             delay.toMillis(),
-            period.toMillis())
-        );
+            TimeUnit.MILLISECONDS
+        ));
+    }
+
+    @Override
+    public Task runLater(Location location, Runnable task, Duration delay) {
+        return wrap(this.regionScheduler.runDelayed(
+            plugin,
+            location,
+            runnable -> task.run(),
+            toTick(delay)
+        ));
+    }
+
+    @Override
+    public Task runLater(Entity entity, Runnable task, Duration delay) {
+        return wrap(entity.getScheduler().runDelayed(
+            plugin,
+            runnable -> task.run(),
+            null,
+            toTick(delay)
+        ));
+    }
+
+    @Override
+    public Task timer(Runnable task, Duration delay, Duration period) {
+        return wrap(this.globalRegionScheduler.runAtFixedRate(
+            plugin,
+            runnable -> task.run(),
+            toTick(delay),
+            toTick(period)
+        ));
     }
 
     @Override
     public Task timerAsync(Runnable task, Duration delay, Duration period) {
-        return new FoliaTaskImpl(this.asyncScheduler.runAtFixedRate(
+        return wrapAsync(this.asyncScheduler.runAtFixedRate(
             plugin,
             runnable -> task.run(),
             delay.toMillis(),
             period.toMillis(),
-            TimeUnit.MILLISECONDS)
-        );
+            TimeUnit.MILLISECONDS
+        ));
     }
 
     @Override
-    public Task timerAsync(Location location, Runnable task, Duration delay, Duration period) {
-        return new FoliaTaskImpl(this.regionScheduler.runAtFixedRate(
+    public Task timer(Location location, Runnable task, Duration delay, Duration period) {
+        return wrap(this.regionScheduler.runAtFixedRate(
             plugin,
             location,
             runnable -> task.run(),
-            delay.toMillis(),
-            period.toMillis())
-        );
+            toTick(delay),
+            toTick(period)
+        ));
     }
 
     @Override
-    public Task timerAsync(Entity entity, Runnable task, Duration delay, Duration period) {
-        return new FoliaTaskImpl(entity.getScheduler().runAtFixedRate(
+    public Task timer(Entity entity, Runnable task, Duration delay, Duration period) {
+        return wrap(entity.getScheduler().runAtFixedRate(
             plugin,
             runnable -> task.run(),
             null,
-            delay.toMillis(),
-            period.toMillis())
-        );
+            toTick(delay),
+            toTick(period)
+        ));
     }
 
     @Override
-    public <T> CompletableFuture<T> completeSync(Supplier<T> task) {
+    public <T> CompletableFuture<T> complete(Supplier<T> task) {
         CompletableFuture<T> completable = new CompletableFuture<>();
         this.globalRegionScheduler.run(plugin, scheduledTask -> completable.complete(task.get()));
         return completable;
@@ -178,4 +168,31 @@ public class FoliaSchedulerImpl implements Scheduler {
         this.asyncScheduler.runNow(plugin, scheduledTask -> completable.complete(task.get()));
         return completable;
     }
+
+    @Override
+    public <T> CompletableFuture<T> complete(Location location, Supplier<T> task) {
+        CompletableFuture<T> completable = new CompletableFuture<>();
+        this.regionScheduler.run(plugin, location, scheduledTask -> completable.complete(task.get()));
+        return completable;
+    }
+
+    @Override
+    public <T> CompletableFuture<T> complete(Entity entity, Supplier<T> task) {
+        CompletableFuture<T> completable = new CompletableFuture<>();
+        entity.getScheduler().run(plugin, scheduledTask -> completable.complete(task.get()), null);
+        return completable;
+    }
+
+    private long toTick(Duration duration) {
+        return duration.toMillis() / 50L;
+    }
+
+    private Task wrap(ScheduledTask task) {
+        return new FoliaTaskImpl(task);
+    }
+
+    private Task wrapAsync(ScheduledTask task) {
+        return new FoliaTaskImpl(task, true);
+    }
+
 }

@@ -2,14 +2,20 @@ package com.eternalcode.commons.folia.scheduler;
 
 import com.eternalcode.commons.scheduler.Task;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
-import org.bukkit.plugin.Plugin;
 
 public class FoliaTaskImpl implements Task {
 
     private final ScheduledTask rootTask;
+    private final boolean async;
 
     public FoliaTaskImpl(ScheduledTask rootTask) {
         this.rootTask = rootTask;
+        this.async = false;
+    }
+
+    public FoliaTaskImpl(ScheduledTask rootTask, boolean async) {
+        this.rootTask = rootTask;
+        this.async = async;
     }
 
     @Override
@@ -24,12 +30,7 @@ public class FoliaTaskImpl implements Task {
 
     @Override
     public boolean isAsync() {
-        return true;
-    }
-
-    @Override
-    public Plugin getPlugin() {
-        return this.rootTask.getOwningPlugin();
+        return async;
     }
 
     @Override
