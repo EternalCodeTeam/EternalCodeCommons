@@ -3,8 +3,6 @@ package com.eternalcode.commons.scheduler;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
-import org.bukkit.Location;
-import org.bukkit.entity.Entity;
 
 public interface Scheduler {
 
