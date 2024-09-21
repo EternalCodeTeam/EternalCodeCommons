@@ -37,11 +37,6 @@ class BukkitTaskImpl implements Task {
     }
 
     @Override
-    public Plugin getPlugin() {
-        return this.rootTask.getOwner();
-    }
-
-    @Override
     public boolean isRunning() {
         // There's no other way,
         // there's no other way
