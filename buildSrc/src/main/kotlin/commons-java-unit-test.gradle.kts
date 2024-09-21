@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    testImplementation("org.mockito:mockito-core:5.12.0")
+    testImplementation("org.mockito:mockito-core:5.13.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.0")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.11.0")
     testImplementation("org.assertj:assertj-core:3.26.3")
