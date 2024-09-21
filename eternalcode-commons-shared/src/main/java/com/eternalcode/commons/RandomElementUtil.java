@@ -1,5 +1,6 @@
 package com.eternalcode.commons;
 
+import com.eternalcode.commons.scheduler.Scheduler;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;

@@ -8,4 +8,8 @@ public interface Task {
 
     boolean isAsync();
 
+    boolean isRunning();
+
+    boolean isRepeating();
+
 }
