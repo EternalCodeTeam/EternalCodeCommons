@@ -31,7 +31,7 @@ public class SimpleDurationUtil {
     public static String format(Duration duration, boolean removeMillis) {
         if (removeMillis) {
             if (duration.toMillis() < ONE_SECOND.toMillis()) {
-                return "0s";
+                return ZERO_SECONDS;
             }
 
             return WITHOUT_MILLIS_FORMAT.format(duration);
