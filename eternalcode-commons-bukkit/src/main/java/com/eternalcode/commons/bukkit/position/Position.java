@@ -13,8 +13,13 @@ public record Position(double x, double y, double z, float yaw, float pitch, Str
     public static final String NONE_WORLD = "__NONE__";
 
     private static final Pattern PARSE_FORMAT = Pattern.compile(
-        "Position\\{x=(?<x>-?[\\d.]+), y=(?<y>-?[\\d.]+), z=(?<z>-?[\\d.]+), yaw=(?<yaw>-?[\\d.]+), pitch=(?<pitch>-?[\\d.]+), world='(?<world>.+)'}");
-
+        "Position\\{x=(?<x>-?[\\d.]+(?:[eE][-+]?\\d+)?), " +
+            "y=(?<y>-?[\\d.]+(?:[eE][-+]?\\d+)?), " +
+            "z=(?<z>-?[\\d.]+(?:[eE][-+]?\\d+)?), " +
+            "yaw=(?<yaw>-?[\\d.]+(?:[eE][-+]?\\d+)?), " +
+            "pitch=(?<pitch>-?[\\d.]+(?:[eE][-+]?\\d+)?), " +
+            "world='(?<world>.+)'}");
+    
     public Position(double x, double y, double z, String world) {
         this(x, y, z, 0F, 0F, world);
     }

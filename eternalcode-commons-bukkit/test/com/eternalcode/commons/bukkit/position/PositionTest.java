@@ -11,7 +11,7 @@ class PositionTest {
 
     @BeforeEach
     void setUp() {
-        position = new Position(1.0d, 2.0d, 3.0d, 4.0f, 5.0f, "world");
+        position = new Position(1.0d, 2.0d, 3.0d, 90.49303f, -6.020069E-6f, "world");
     }
 
     @Test
@@ -36,12 +36,12 @@ class PositionTest {
 
     @Test
     void getYaw() {
-        assertEquals(4.0f, position.yaw());
+        assertEquals(90.49303f, position.yaw());
     }
 
     @Test
     void getPitch() {
-        assertEquals(5.0f, position.pitch());
+        assertEquals(-6.020069E-6f, position.pitch());
     }
 
     @Test
@@ -51,8 +51,8 @@ class PositionTest {
 
     @Test
     void testEqualsAndHashCode() {
-        Position position2 = new Position(1.0d, 2.0d, 3.0d, 4.0f, 5.0f, "world");
-        Position position3 = new Position(1.0d, 2.0d, 3.1d, 4.0f, 5.0f, "world");
+        Position position2 = new Position(1.0d, 2.0d, 3.0d, 90.49303f, -6.020069E-6f, "world");
+        Position position3 = new Position(1.0d, 2.0d, 3.1d, 90.49303f, -6.020069E-6f, "world");
 
         // Reflexive test
         assertEquals(position, position);
@@ -71,18 +71,18 @@ class PositionTest {
 
     @Test
     void testToString() {
-        String expectedString = "Position{x=1.0, y=2.0, z=3.0, yaw=4.0, pitch=5.0, world='world'}";
+        String expectedString = "Position{x=1.0, y=2.0, z=3.0, yaw=90.49303, pitch=-6.020069E-6, world='world'}";
         assertEquals(expectedString, position.toString());
     }
 
     @Test
     void parse() {
-        Position parsed = Position.parse("Position{x=1.0, y=2.0, z=3.0, yaw=4.0, pitch=5.0, world='world'}");
+        Position parsed = Position.parse("Position{x=1.0, y=2.0, z=3.0, yaw=90.49303, pitch=-6.020069E-6, world='world'}");
         assertEquals(position, parsed);
     }
 
     @Test
     void parseInvalid() {
-        assertThrows(IllegalArgumentException.class, () -> Position.parse("Invalid{x=1.0, y=2.0, z=3.0, yaw=4.0, pitch=5.0, world='world'}"));
+        assertThrows(IllegalArgumentException.class, () -> Position.parse("Invalid{x=1.0, y=2.0, z=3.0, yaw=90.49303, pitch=-6.020069E-6, world='world'}"));
     }
 }
