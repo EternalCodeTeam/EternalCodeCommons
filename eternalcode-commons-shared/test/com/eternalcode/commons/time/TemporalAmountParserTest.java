@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.eternalcode.commons.time.TemporalAmountParser.LocalDateTimeProvider;
+import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -199,7 +200,7 @@ class TemporalAmountParserTest {
             .withUnit("m", ChronoUnit.MINUTES)
             .withUnit("h", ChronoUnit.HOURS)
             .withUnit("d", ChronoUnit.DAYS)
-            .roundOff(ChronoUnit.MILLIS);
+            .withRounded(ChronoUnit.MILLIS, RoundingMode.UP);
 
         Duration temporalAmount = Duration.ofDays(1)
             .plus(Duration.ofHours(1))
