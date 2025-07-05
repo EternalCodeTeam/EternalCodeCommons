@@ -4,11 +4,10 @@ plugins {
 }
 
 group = "com.eternalcode"
-version = "1.1.6"
+version = "1.1.7"
 
 java {
     withSourcesJar()
-//    withJavadocJar()
 }
 
 publishing {
