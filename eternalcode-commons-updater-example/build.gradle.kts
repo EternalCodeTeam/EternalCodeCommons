@@ -1,5 +1,6 @@
 plugins {
     `commons-java-17`
+    `commons-repositories`
 }
 
 dependencies {

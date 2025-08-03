@@ -1,5 +1,6 @@
 package com.eternalcode.commons.updater.impl;
 
+import com.eternalcode.commons.Lazy;
 import com.eternalcode.commons.updater.UpdateChecker;
 import com.eternalcode.commons.updater.UpdateResult;
 import com.eternalcode.commons.updater.Version;
@@ -8,7 +9,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.Optional;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public final class ModrinthUpdateChecker implements UpdateChecker {
 
@@ -17,11 +20,7 @@ public final class ModrinthUpdateChecker implements UpdateChecker {
     private static final String USER_AGENT = "UpdateChecker/1.0";
     private static final Duration TIMEOUT = Duration.ofSeconds(10);
 
-    private final HttpClient client;
-
-    public ModrinthUpdateChecker() {
-        this.client = HttpClient.newBuilder().connectTimeout(TIMEOUT).build();
-    }
+    private final Lazy<HttpClient> client = new Lazy<>(() -> HttpClient.newBuilder().connectTimeout(TIMEOUT).build());
 
     @Override
     public UpdateResult check(String projectId, Version currentVersion) {
@@ -35,7 +34,7 @@ public final class ModrinthUpdateChecker implements UpdateChecker {
             HttpRequest request =
                 HttpRequest.newBuilder().uri(URI.create(url)).header("User-Agent", USER_AGENT).timeout(TIMEOUT).build();
 
-            HttpResponse<String> response = this.client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = this.client.get().send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() != 200) {
                 return createEmptyResult(currentVersion);
@@ -46,47 +45,48 @@ public final class ModrinthUpdateChecker implements UpdateChecker {
                 return createEmptyResult(currentVersion);
             }
 
-            Optional<String> versionNumber = extractJsonValue(json, "version_number");
-            Optional<String> downloadUrl = extractJsonValue(json, "url");
-
-            if (versionNumber.isEmpty()) {
-                return createEmptyResult(currentVersion);
-            }
-
-            String releaseUrl = MODRINTH_BASE_URL + "/" + projectId + "/version/" + versionNumber.get();
-            Version latestVersion = new Version(versionNumber.get());
-
-            return new UpdateResult(currentVersion, latestVersion, downloadUrl.orElse(null), releaseUrl);
+            return parseVersionResponse(json, currentVersion, projectId);
         }
         catch (Exception exception) {
             throw new RuntimeException("Failed to check Modrinth updates for project: " + projectId, exception);
         }
     }
 
-    private UpdateResult createEmptyResult(Version currentVersion) {
-        return new UpdateResult(currentVersion, currentVersion, null, null);
+    private UpdateResult parseVersionResponse(String json, Version currentVersion, String projectId) {
+        try {
+            JSONArray versions = new JSONArray(json);
+
+            if (versions.isEmpty()) {
+                return createEmptyResult(currentVersion);
+            }
+
+            JSONObject latestVersionObj = versions.getJSONObject(0);
+
+            String versionNumber = latestVersionObj.optString("version_number", null);
+            if (versionNumber == null || versionNumber.trim().isEmpty()) {
+                return createEmptyResult(currentVersion);
+            }
+
+            String downloadUrl = null;
+            if (latestVersionObj.has("files")) {
+                JSONArray files = latestVersionObj.getJSONArray("files");
+                if (!files.isEmpty()) {
+                    JSONObject firstFile = files.getJSONObject(0);
+                    downloadUrl = firstFile.optString("url", null);
+                }
+            }
+
+            String releaseUrl = MODRINTH_BASE_URL + "/" + projectId + "/version/" + versionNumber;
+            Version latestVersion = new Version(versionNumber);
+
+            return new UpdateResult(currentVersion, latestVersion, downloadUrl, releaseUrl);
+        }
+        catch (JSONException exception) {
+            return createEmptyResult(currentVersion);
+        }
     }
 
-    private Optional<String> extractJsonValue(String json, String key) {
-        if (json == null || key == null) {
-            return Optional.empty();
-        }
-
-        String pattern = "\"" + key + "\":\"";
-        int start = json.indexOf(pattern);
-
-        if (start == -1) {
-            return Optional.empty();
-        }
-
-        start += pattern.length();
-        int end = json.indexOf("\"", start);
-
-        if (end == -1) {
-            return Optional.empty();
-        }
-
-        String value = json.substring(start, end);
-        return value.isEmpty() ? Optional.empty() : Optional.of(value);
+    private UpdateResult createEmptyResult(Version currentVersion) {
+        return new UpdateResult(currentVersion, currentVersion, null, null);
     }
 }
