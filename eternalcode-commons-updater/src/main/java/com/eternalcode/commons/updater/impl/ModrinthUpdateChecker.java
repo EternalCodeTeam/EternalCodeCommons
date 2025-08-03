@@ -16,7 +16,7 @@ import org.json.JSONObject;
 public final class ModrinthUpdateChecker implements UpdateChecker {
 
     private static final String API_BASE_URL = "https://api.modrinth.com/v2";
-    private static final String MODRINTH_BASE_URL = "https://modrinth.com/mod";
+    private static final String MODRINTH_BASE_URL = "https://modrinth.com/plugin";
     private static final String USER_AGENT = "UpdateChecker/1.0";
     private static final Duration TIMEOUT = Duration.ofSeconds(10);
 
