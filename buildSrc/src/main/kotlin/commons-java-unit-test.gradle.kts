@@ -4,11 +4,11 @@ plugins {
 
 dependencies {
     testImplementation("org.mockito:mockito-core:5.18.0")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.4")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:5.11.4")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.13.4")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.13.4")
     testImplementation("org.assertj:assertj-core:3.27.4")
     testImplementation("org.awaitility:awaitility:4.3.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.11.4")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.13.4")
 }
 
 tasks.getByName<Test>("test") {
