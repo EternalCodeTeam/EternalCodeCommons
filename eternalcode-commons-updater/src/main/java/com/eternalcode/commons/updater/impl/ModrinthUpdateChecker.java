@@ -1,51 +1,51 @@
 package com.eternalcode.commons.updater.impl;
 
-import com.eternalcode.commons.Lazy;
 import com.eternalcode.commons.updater.UpdateChecker;
 import com.eternalcode.commons.updater.UpdateResult;
 import com.eternalcode.commons.updater.Version;
+import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
+import com.google.gson.annotations.SerializedName;
+import com.google.gson.reflect.TypeToken;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.util.List;
+import java.util.Objects;
 
 public final class ModrinthUpdateChecker implements UpdateChecker {
 
     private static final String API_BASE_URL = "https://api.modrinth.com/v2";
     private static final String MODRINTH_BASE_URL = "https://modrinth.com/plugin";
     private static final String USER_AGENT = "UpdateChecker/1.0";
-    private static final Duration TIMEOUT = Duration.ofSeconds(10);
 
-    private final Lazy<HttpClient> client = new Lazy<>(() -> HttpClient.newBuilder().connectTimeout(TIMEOUT).build());
+    private static final Gson GSON = new Gson();
+
+    private final HttpClient client = HttpClient.newBuilder()
+        .connectTimeout(Duration.ofSeconds(60))
+        .build();
 
     @Override
     public UpdateResult check(String projectId, Version currentVersion) {
-        if (projectId == null || projectId.trim().isEmpty()) {
+        if (projectId == null || projectId.isBlank()) {
             throw new IllegalArgumentException("Project ID cannot be null or empty");
         }
 
         try {
-            String url = API_BASE_URL + "/project/" + projectId + "/version";
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(API_BASE_URL + "/project/" + projectId + "/version"))
+                .header("User-Agent", USER_AGENT)
+                .timeout(Duration.ofSeconds(30))
+                .build();
 
-            HttpRequest request =
-                HttpRequest.newBuilder().uri(URI.create(url)).header("User-Agent", USER_AGENT).timeout(TIMEOUT).build();
-
-            HttpResponse<String> response = this.client.get().send(request, HttpResponse.BodyHandlers.ofString());
-
+            HttpResponse<String> response = this.client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() != 200) {
-                return createEmptyResult(currentVersion);
+                return UpdateResult.empty(currentVersion);
             }
 
-            String json = response.body();
-            if (json == null || json.trim().isEmpty()) {
-                return createEmptyResult(currentVersion);
-            }
-
-            return parseVersionResponse(json, currentVersion, projectId);
+            return this.parseVersionResponse(response.body(), currentVersion, projectId);
         }
         catch (Exception exception) {
             throw new RuntimeException("Failed to check Modrinth updates for project: " + projectId, exception);
@@ -54,39 +54,35 @@ public final class ModrinthUpdateChecker implements UpdateChecker {
 
     private UpdateResult parseVersionResponse(String json, Version currentVersion, String projectId) {
         try {
-            JSONArray versions = new JSONArray(json);
-
-            if (versions.isEmpty()) {
-                return createEmptyResult(currentVersion);
+            List<ModrinthVersion> versions = GSON.fromJson(json, new TypeToken<>(){});
+            if (versions == null || versions.isEmpty()) {
+                return UpdateResult.empty(currentVersion);
             }
 
-            JSONObject latestVersionObj = versions.getJSONObject(0);
-
-            String versionNumber = latestVersionObj.optString("version_number", null);
+            ModrinthVersion latestVersionData = versions.get(0);
+            String versionNumber = latestVersionData.versionNumber();
             if (versionNumber == null || versionNumber.trim().isEmpty()) {
-                return createEmptyResult(currentVersion);
-            }
-
-            String downloadUrl = null;
-            if (latestVersionObj.has("files")) {
-                JSONArray files = latestVersionObj.getJSONArray("files");
-                if (!files.isEmpty()) {
-                    JSONObject firstFile = files.getJSONObject(0);
-                    downloadUrl = firstFile.optString("url", null);
-                }
+                return UpdateResult.empty(currentVersion);
             }
 
             String releaseUrl = MODRINTH_BASE_URL + "/" + projectId + "/version/" + versionNumber;
-            Version latestVersion = new Version(versionNumber);
+            String downloadUrl = latestVersionData.files().stream()
+                .map(modrinthFile -> modrinthFile.url())
+                .filter(obj -> Objects.nonNull(obj))
+                .findFirst()
+                .orElse(releaseUrl);
 
+            Version latestVersion = new Version(versionNumber);
             return new UpdateResult(currentVersion, latestVersion, downloadUrl, releaseUrl);
         }
-        catch (JSONException exception) {
-            return createEmptyResult(currentVersion);
+        catch (JsonParseException exception) {
+            return UpdateResult.empty(currentVersion);
         }
     }
 
-    private UpdateResult createEmptyResult(Version currentVersion) {
-        return new UpdateResult(currentVersion, currentVersion, null, null);
+    private record ModrinthVersion(@SerializedName("version_number") String versionNumber, List<ModrinthFile> files) {
+    }
+
+    private record ModrinthFile(String url) {
     }
 }
