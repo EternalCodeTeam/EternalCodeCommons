@@ -14,19 +14,14 @@ public class ProgressBar {
     private final int length;
 
     private ProgressBar(Builder builder) {
-        String filledChar = builder.filledChar;
-        String emptyChar = builder.emptyChar;
-        String filledColor = builder.filledColor;
-        String emptyColor = builder.emptyColor;
-
         this.leftBracket = builder.leftBracket;
         this.rightBracket = builder.rightBracket;
         this.bracketColor = builder.bracketColor;
         this.length = builder.length;
         this.showBrackets = builder.showBrackets;
 
-        this.filledToken = filledColor + filledChar;
-        this.emptyToken = emptyColor + emptyChar;
+        this.filledToken = builder.filledColor + builder.filledChar;
+        this.emptyToken = builder.emptyColor + builder.emptyChar;
     }
 
     public String render(double progress) {
