@@ -33,9 +33,7 @@ class ProgressBarTest {
             .build();
         String rendered = bar.render(0.5);
 
-        assertTrue(rendered.contains("█"));
-        assertTrue(rendered.contains("░"));
-        assertEquals(6, rendered.length());
+        assertEquals("[██░░]", rendered);
     }
 
     @Test
