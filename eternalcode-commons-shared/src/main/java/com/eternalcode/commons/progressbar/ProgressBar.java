@@ -45,11 +45,7 @@ public class ProgressBar {
     }
 
     public String render(int current, int max) {
-        if (max <= 0) {
-            return this.render(1.0);
-        }
-        double progress = (double) current / max;
-        return this.render(progress);
+        return this.render(current, (long) max);
     }
 
     public String render(long current, long max) {
