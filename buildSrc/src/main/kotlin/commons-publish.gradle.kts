@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.eternalcode"
-version = "1.3.1"
+version = "1.3.3-SNAPSHOT"
 
 java {
     withSourcesJar()
@@ -14,16 +14,21 @@ publishing {
     repositories {
         mavenLocal()
 
-        maven {
-            url = uri("https://repo.eternalcode.pl/releases")
+        val mavenUsername = System.getenv("ETERNAL_CODE_MAVEN_USERNAME")
+        val mavenPassword = System.getenv("ETERNAL_CODE_MAVEN_PASSWORD")
 
-            if (version.toString().endsWith("-SNAPSHOT")) {
-                url = uri("https://repo.eternalcode.pl/snapshots")
-            }
+        if (!mavenUsername.isNullOrBlank() && !mavenPassword.isNullOrBlank()) {
+            maven {
+                url = uri("https://repo.eternalcode.pl/releases")
 
-            credentials {
-                username = System.getenv("ETERNAL_CODE_MAVEN_USERNAME")
-                password = System.getenv("ETERNAL_CODE_MAVEN_PASSWORD")
+                if (version.toString().endsWith("-SNAPSHOT")) {
+                    url = uri("https://repo.eternalcode.pl/snapshots")
+                }
+
+                credentials {
+                    username = mavenUsername
+                    password = mavenPassword
+                }
             }
         }
     }
@@ -34,3 +39,4 @@ publishing {
         }
     }
 }
+
