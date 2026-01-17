@@ -54,12 +54,25 @@ public final class ModrinthUpdateChecker implements UpdateChecker {
 
     private UpdateResult parseVersionResponse(String json, Version currentVersion, String projectId) {
         try {
-            List<ModrinthVersion> versions = GSON.fromJson(json, new TypeToken<>(){});
+            List<ModrinthVersion> versions = GSON.fromJson(
+                json, new TypeToken<>() {
+                });
             if (versions == null || versions.isEmpty()) {
                 return UpdateResult.empty(currentVersion);
             }
 
-            ModrinthVersion latestVersionData = versions.get(0);
+            List<ModrinthVersion> filteredVersions = versions;
+            if (!currentVersion.isSnapshot()) {
+                filteredVersions = versions.stream()
+                    .filter(version -> !version.versionNumber().contains("-SNAPSHOT"))
+                    .toList();
+            }
+
+            if (filteredVersions.isEmpty()) {
+                return UpdateResult.empty(currentVersion);
+            }
+
+            ModrinthVersion latestVersionData = filteredVersions.get(0);
             String versionNumber = latestVersionData.versionNumber();
             if (versionNumber == null || versionNumber.trim().isEmpty()) {
                 return UpdateResult.empty(currentVersion);
@@ -67,8 +80,8 @@ public final class ModrinthUpdateChecker implements UpdateChecker {
 
             String releaseUrl = MODRINTH_BASE_URL + "/" + projectId + "/version/" + versionNumber;
             String downloadUrl = latestVersionData.files().stream()
-                .map(modrinthFile -> modrinthFile.url())
-                .filter(obj -> Objects.nonNull(obj))
+                .map(ModrinthFile::url)
+                .filter(Objects::nonNull)
                 .findFirst()
                 .orElse(releaseUrl);
 
