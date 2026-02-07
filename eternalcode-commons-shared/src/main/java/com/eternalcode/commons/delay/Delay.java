@@ -30,6 +30,7 @@ public class Delay<T> {
     public void markDelay(T key, Duration delay) {
         if (delay.isZero() || delay.isNegative()) {
             this.cache.invalidate(key);
+            return;
         }
 
         this.cache.put(key, Instant.now().plus(delay));
@@ -49,10 +50,12 @@ public class Delay<T> {
     }
 
     public Duration getRemaining(T key) {
-        return Duration.between(Instant.now(), this.getExpireAt(key));
+        Duration remaining = Duration.between(Instant.now(), this.getExpireAt(key));
+        return remaining.isNegative() ? Duration.ZERO : remaining;
     }
 
     private Instant getExpireAt(T key) {
-        return this.cache.asMap().getOrDefault(key, Instant.MIN);
+        Instant expireAt = this.cache.getIfPresent(key);
+        return expireAt != null ? expireAt : Instant.MIN;
     }
 }
