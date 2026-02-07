@@ -2,6 +2,7 @@ package com.eternalcode.commons.delay;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -46,16 +47,22 @@ public class Delay<T> {
 
     public boolean hasDelay(T key) {
         Instant delayExpireMoment = this.getExpireAt(key);
+        if (delayExpireMoment == null) {
+            return false;
+        }
         return Instant.now().isBefore(delayExpireMoment);
     }
 
     public Duration getRemaining(T key) {
-        Duration remaining = Duration.between(Instant.now(), this.getExpireAt(key));
-        return remaining.isNegative() ? Duration.ZERO : remaining;
+        Instant expireAt = this.getExpireAt(key);
+        if (expireAt == null) {
+            return Duration.ZERO;
+        }
+        return Duration.between(Instant.now(), expireAt);
     }
 
+    @Nullable
     private Instant getExpireAt(T key) {
-        Instant expireAt = this.cache.getIfPresent(key);
-        return expireAt != null ? expireAt : Instant.MIN;
+        return this.cache.getIfPresent(key);
     }
 }

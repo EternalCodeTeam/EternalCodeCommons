@@ -7,34 +7,29 @@ import java.time.Instant;
 
 public class InstantExpiry<T> implements Expiry<T, Instant> {
 
-    private long timeToExpire(Instant expireTime, long currentTimeNanos) {
-        Instant currentInstant = Instant.ofEpochSecond(0, currentTimeNanos);
-        Duration toExpire = Duration.between(currentInstant, expireTime);
-
-        if (toExpire.isNegative() || toExpire.isZero()) {
-            return 0;
-        }
+    private long timeToExpire(Instant expireTime) {
+        Duration toExpire = Duration.between(Instant.now(), expireTime);
 
         try {
             return toExpire.toNanos();
         } catch (ArithmeticException overflow) {
-            return Long.MAX_VALUE;
+            return toExpire.isNegative() ? Long.MIN_VALUE : Long.MAX_VALUE;
         }
     }
 
     @Override
     public long expireAfterCreate(T key, Instant expireTime, long currentTime) {
-        return timeToExpire(expireTime, currentTime);
+        return timeToExpire(expireTime);
     }
 
     @Override
     public long expireAfterUpdate(T key, Instant newExpireTime, long currentTime, long currentDuration) {
-        return timeToExpire(newExpireTime, currentTime);
+        return timeToExpire(newExpireTime);
     }
 
     @Override
-    public long expireAfterRead(T key, Instant value, long currentTime, long currentDuration) {
-        return currentDuration;
+    public long expireAfterRead(T key, Instant expireTime, long currentTime, long currentDuration) {
+        return timeToExpire(expireTime);
     }
 
 }
