@@ -70,7 +70,7 @@ class DelayTest {
     }
 
     @Test
-    void shouldReturnCorrectRemainingTime() throws InterruptedException {
+    void shouldReturnCorrectRemainingTime() {
         Delay<UUID> delay = Delay.withDefault(() -> Duration.ofMillis(500));
         UUID key = UUID.randomUUID();
 
@@ -128,7 +128,7 @@ class DelayTest {
 
     @Test
     void testExpireAfterCreate_withOverflow_shouldReturnMaxValue() {
-        InstantExpiry<String> expiry = new InstantExpiry<>();
+        Delay.InstantExpiry<String> expiry = new Delay.InstantExpiry<>();
         Instant farFuture = Instant.now().plus(Duration.ofDays(1000000000));
 
         long result = expiry.expireAfterCreate("key", farFuture, 0);
@@ -138,7 +138,7 @@ class DelayTest {
 
     @Test
     void testExpireAfterCreate_withOverflow_shouldReturnMinValue() {
-        InstantExpiry<String> expiry = new InstantExpiry<>();
+        Delay.InstantExpiry<String> expiry = new Delay.InstantExpiry<>();
         Instant farPast = Instant.now().minus(Duration.ofDays(1000000000));
 
         long result = expiry.expireAfterCreate("key", farPast, 0);
