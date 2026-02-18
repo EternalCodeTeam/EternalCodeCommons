@@ -12,7 +12,7 @@ dependencies {
 
     compileOnly("dev.folia:folia-api:1.20.1-R0.1-SNAPSHOT")
 
-    api("org.jetbrains:annotations:26.0.2-1")
+    api("org.jetbrains:annotations:26.1.0")
 }
 
 tasks.test {

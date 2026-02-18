@@ -14,5 +14,5 @@ dependencies {
     api("com.google.code.gson:gson:2.13.2")
     api(project(":eternalcode-commons-shared"))
 
-    api("org.jetbrains:annotations:26.0.2-1")
+    api("org.jetbrains:annotations:26.1.0")
 }
