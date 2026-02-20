@@ -63,7 +63,7 @@ public class Delay<T> {
     }
 
     @Nullable
-    private Instant getExpireAt(T key) {
+    public Instant getExpireAt(T key) {
         return this.cache.getIfPresent(key);
     }
 
