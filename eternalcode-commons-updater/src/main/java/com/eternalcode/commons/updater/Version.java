@@ -19,6 +19,16 @@ public class Version implements Comparable<Version> {
         this.versionComponents = parseVersion(this.value);
     }
 
+    private static String cleanVersion(String version) {
+        String cleaned = version.startsWith("v") ? version.substring(1) : version;
+        int dashIndex = cleaned.indexOf('-');
+        if (dashIndex > 0) {
+            return cleaned.substring(0, dashIndex);
+        }
+
+        return cleaned;
+    }
+
     private int[] parseVersion(String version) {
         String cleaned = cleanVersion(version);
         String[] rawVersionComponents = cleaned.split("\\.");
@@ -34,16 +44,6 @@ public class Version implements Comparable<Version> {
         }
 
         return versionComponents;
-    }
-
-    private static String cleanVersion(String version) {
-        String cleaned = version.startsWith("v") ? version.substring(1) : version;
-        int dashIndex = cleaned.indexOf('-');
-        if (dashIndex > 0) {
-            return cleaned.substring(0, dashIndex);
-        }
-
-        return cleaned;
     }
 
     @Override
@@ -90,6 +90,10 @@ public class Version implements Comparable<Version> {
     @Override
     public int hashCode() {
         return Arrays.hashCode(versionComponents);
+    }
+
+    public boolean isSnapshot() {
+        return this.value.contains("-SNAPSHOT");
     }
 
     @Override
