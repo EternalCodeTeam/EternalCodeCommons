@@ -128,19 +128,8 @@ public class LoomSchedulerImpl implements LoomScheduler {
         if (this.shutdown.get()) {
             return LoomTask.EMPTY;
         }
-        long ticks = delay.toMillis() / 50L;
-        CompletableFuture<Void> future = new CompletableFuture<>();
-        this.dispatcher.dispatchLater(
-            () -> {
-                try {
-                    task.run();
-                    future.complete(null);
-                }
-                catch (Throwable t) {
-                    future.completeExceptionally(t);
-                }
-            }, ticks);
-        return new SimpleLoomTask(future, false, false);
+        DelayedTask dt = this.vtExecutor.submitDelayed(() -> this.dispatcher.dispatch(task), delay);
+        return new DelayedLoomTask(dt, false, false);
     }
 
     @Override
@@ -148,10 +137,8 @@ public class LoomSchedulerImpl implements LoomScheduler {
         if (this.shutdown.get()) {
             return LoomTask.EMPTY;
         }
-        long delayTicks = delay.toMillis() / 50L;
-        long periodTicks = period.toMillis() / 50L;
-        MainThreadDispatcher.Cancellable c = this.dispatcher.dispatchTimer(task, delayTicks, periodTicks);
-        return new CancellableLoomTask(c, false, true);
+        DelayedTask dt = this.vtExecutor.submitRepeating(() -> this.dispatcher.dispatch(task), delay, period);
+        return new DelayedLoomTask(dt, false, true);
     }
 
     @Override
@@ -269,52 +256,4 @@ public class LoomSchedulerImpl implements LoomScheduler {
             }
         }
 
-    private static final class CancellableLoomTask implements LoomTask {
-        private final MainThreadDispatcher.Cancellable cancellable;
-        private final boolean async;
-        private final boolean repeating;
-        private volatile boolean cancelled = false;
-
-        CancellableLoomTask(MainThreadDispatcher.Cancellable cancellable, boolean async, boolean repeating) {
-            this.cancellable = cancellable;
-            this.async = async;
-            this.repeating = repeating;
-        }
-
-        @Override
-        public void cancel() {
-            this.cancelled = true;
-            this.cancellable.cancel();
-        }
-
-        @Override
-        public boolean isCancelled() {
-            return this.cancelled;
-        }
-
-        @Override
-        public boolean isRunning() {
-            return !this.cancelled;
-        }
-
-        @Override
-        public boolean isDone() {
-            return this.cancelled;
-        }
-
-        @Override
-        public boolean async() {
-            return this.async;
-        }
-
-        @Override
-        public boolean repeating() {
-            return this.repeating;
-        }
-
-        @Override
-        public Future<?> asFuture() {
-            return null;
-        }
-    }
 }

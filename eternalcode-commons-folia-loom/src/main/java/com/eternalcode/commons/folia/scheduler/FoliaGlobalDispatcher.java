@@ -58,15 +58,15 @@ public final class FoliaGlobalDispatcher implements MainThreadDispatcher {
     }
 
     public void shutdown() {
-        if (this.tickTask != null) {
-            this.tickTask.cancel();
-        }
+        this.tickTask.cancel();
         Runnable task;
         while ((task = this.queue.poll()) != null) {
             try {
                 task.run();
             }
-            catch (Throwable ignored) {
+            catch (Throwable t) {
+                this.plugin.getLogger().severe("Exception in global shutdown task: " + t.getMessage());
+                t.printStackTrace();
             }
         }
     }

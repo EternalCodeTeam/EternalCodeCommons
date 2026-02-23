@@ -220,6 +220,23 @@ class LoomSchedulerImplTest {
     }
 
     @Test
+    @DisplayName("runSyncLater cancel should prevent dispatching to main thread")
+    void runSyncLater_cancelPreventsDispatch() throws InterruptedException {
+        AtomicBoolean executed = new AtomicBoolean(false);
+
+        LoomTask task = this.scheduler.runSyncLater(
+            () -> executed.set(true),
+            Duration.ofMillis(300));
+
+        task.cancel();
+        Thread.sleep(450);
+        this.dispatcher.runPending();
+
+        assertTrue(task.isCancelled());
+        assertFalse(executed.get(), "Cancelled sync task should not be dispatched");
+    }
+
+    @Test
     @DisplayName("delay should create non-blocking delay")
     void delay_createsNonBlockingDelay() throws InterruptedException {
         AtomicBoolean completed = new AtomicBoolean(false);

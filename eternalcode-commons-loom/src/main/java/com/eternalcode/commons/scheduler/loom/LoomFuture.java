@@ -2,6 +2,7 @@ package com.eternalcode.commons.scheduler.loom;
 
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -188,7 +189,7 @@ public class LoomFuture<T> implements LoomTask {
     }
 
     @Override
-    public java.util.concurrent.Future<?> asFuture() {
+    public Future<?> asFuture() {
         return this.future;
     }
 }

@@ -15,7 +15,7 @@ public final class BukkitMainThreadDispatcher implements MainThreadDispatcher {
     private final ConcurrentLinkedQueue<Runnable> queue = new ConcurrentLinkedQueue<>();
     private final Plugin plugin;
     private final BukkitScheduler bukkitScheduler;
-    private BukkitTask tickTask;
+    private final BukkitTask tickTask;
 
     public BukkitMainThreadDispatcher(Plugin plugin) {
         this.plugin = plugin;
@@ -66,9 +66,7 @@ public final class BukkitMainThreadDispatcher implements MainThreadDispatcher {
     }
 
     public void shutdown() {
-        if (this.tickTask != null) {
-            this.tickTask.cancel();
-        }
+        this.tickTask.cancel();
         Runnable task;
         while ((task = this.queue.poll()) != null) {
             try {
