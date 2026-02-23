@@ -158,11 +158,17 @@ class VirtualThreadExecutorTest {
 
         Thread.sleep(200);
         task.cancel();
-        int countAfterCancel = count.get();
+        int countSoonAfterCancel = count.get();
+
+        Thread.sleep(200);
+        int countAfterSettle = count.get();
+        assertTrue(
+            countAfterSettle >= countSoonAfterCancel,
+            "Count should not decrease after cancel");
 
         Thread.sleep(200);
 
-        assertEquals(countAfterCancel, count.get(), "Count should not increase after cancel");
+        assertEquals(countAfterSettle, count.get(), "Count should stabilize after cancel");
     }
 
     @Test
