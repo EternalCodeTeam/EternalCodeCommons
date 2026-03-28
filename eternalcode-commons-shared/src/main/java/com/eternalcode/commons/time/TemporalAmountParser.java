@@ -295,33 +295,15 @@ public abstract class TemporalAmountParser<T extends TemporalAmount> {
         }
     }
 
-    /**
-     * Formats the given estimated temporal amount to a string.
-     * <p>
-     *     Examples:
-     * </p>
-     * <ul>
-     *     <li>Duration of 30 seconds: {@code 30s}</li>
-     *     <li>Duration of 25 hours: {@code 1d1h}</li>
-     *     <li>Duration of 1 year, 2 months, 3 weeks, 4 days, 5 hours, 6 minutes and 7 seconds: {@code 1y2mo3w4d5h6m7s}</li>
-     *     <li>Duration of 1 hours and 61 minutes: {@code 2h1m}</li>
-     *     <li>Past duration of 1 hours and 61 minutes: {@code -2h1m}</li>
-     *     <li>Period of 1 year, 2 months, 4 days: {@code 1y2mo4d}</li>
-     *     <li>Past period of 1 year, 2 months, 4 days: {@code -1y2mo4d}</li>
-     * </ul>
-     *
-     * @param temporalAmount the temporal amount to format. Must not be null.
-     * @return the formatted string
-     */
-    public String format(T temporalAmount) {
-        StringBuilder builder = new StringBuilder();
+    public TimeResult prepare(T temporalAmount) {
+        List<TimePart> parts = new ArrayList<>();
         Duration duration = this.toDuration(this.baseForTimeEstimation, temporalAmount);
         for (TimeModifier modifier : this.modifiers) {
             duration = modifier.modify(duration);
         }
 
+        boolean isNegative = duration.isNegative();
         if (duration.isNegative()) {
-            builder.append('-');
             duration = duration.negated();
         }
 
@@ -345,18 +327,52 @@ public abstract class TemporalAmountParser<T extends TemporalAmount> {
 
             BigInteger nanosCountCleared = count.multiply(nanosInOneUnit);
 
-            builder.append(count).append(key);
+            parts.add(new TimePart(count, key, unit));
             duration = duration.minusNanos(nanosCountCleared.longValue());
         }
 
-        String result = builder.toString();
+        return new TimeResult(parts, isNegative);
+    }
 
-        if (result.isEmpty()) {
+    /**
+     * Formats the given estimated temporal amount to a string.
+     * <p>
+     *     Examples:
+     * </p>
+     * <ul>
+     *     <li>Duration of 30 seconds: {@code 30s}</li>
+     *     <li>Duration of 25 hours: {@code 1d1h}</li>
+     *     <li>Duration of 1 year, 2 months, 3 weeks, 4 days, 5 hours, 6 minutes and 7 seconds: {@code 1y2mo3w4d5h6m7s}</li>
+     *     <li>Duration of 1 hours and 61 minutes: {@code 2h1m}</li>
+     *     <li>Past duration of 1 hours and 61 minutes: {@code -2h1m}</li>
+     *     <li>Period of 1 year, 2 months, 4 days: {@code 1y2mo4d}</li>
+     *     <li>Past period of 1 year, 2 months, 4 days: {@code -1y2mo4d}</li>
+     * </ul>
+     *
+     * @param temporalAmount the temporal amount to format. Must not be null.
+     * @return the formatted string
+     */
+    public String format(T temporalAmount) {
+        TimeResult result = this.prepare(temporalAmount);
+        if (result.parts().isEmpty()) {
             String defaultSymbol = this.defaultZeroSymbol.get();
             return "0" + defaultSymbol;
         }
 
-        return result;
+        StringBuilder builder = new StringBuilder();
+        if (result.isNegative()) {
+            builder.append('-');
+        }
+
+        for (TimePart part : result.parts()) {
+            if (part.count().equals(BigInteger.ZERO)) {
+                continue;
+            }
+
+            builder.append(part.count()).append(part.name());
+        }
+
+        return builder.toString();
     }
 
     protected abstract Duration toDuration(LocalDateTimeProvider baseForTimeEstimation, T temporalAmount);
