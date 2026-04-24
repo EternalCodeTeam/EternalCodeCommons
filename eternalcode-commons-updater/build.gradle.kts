@@ -11,7 +11,7 @@ tasks.test {
 
 
 dependencies {
-    api("com.google.code.gson:gson:2.13.2")
+    api("com.google.code.gson:gson:2.14.0")
     api(project(":eternalcode-commons-shared"))
 
     api("org.jetbrains:annotations:26.1.0")
