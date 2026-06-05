@@ -19,7 +19,7 @@ public class AdventureUtil {
         .useUnusualXRepeatedCharacterHexFormat()
         .build();
 
-    private static final Component RESET_ITALIC = Component.text().decoration(TextDecoration.ITALIC, false).build();
+    private static final Component RESET_ITALIC = Component.empty().decoration(TextDecoration.ITALIC, false);
 
     private AdventureUtil() {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
