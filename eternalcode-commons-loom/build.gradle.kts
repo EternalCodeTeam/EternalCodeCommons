@@ -15,7 +15,7 @@ sourceSets {
 }
 
 dependencies {
-    testImplementation("org.junit.jupiter:junit-jupiter:6.1.2")
+    testImplementation("org.junit.jupiter:junit-jupiter:6.1.3")
 }
 
 tasks.test {
