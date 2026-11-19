@@ -13,7 +13,7 @@ sourceSets {
 dependencies {
     api(project(":eternalcode-commons-loom"))
     
-    compileOnly("dev.folia:folia-api:1.20.4-R0.1-SNAPSHOT")
+    compileOnly("dev.folia:folia-api:26.3.build.26-stable")
     
     api("org.jetbrains:annotations:26.1.0")
 }
